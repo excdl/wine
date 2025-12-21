@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>取酒系統</title>
+<style>
+body { font-family: Arial; background:#f5f6fa; padding:20px; }
+h2 { margin-bottom:10px; }
+input, button { font-size:16px; padding:8px; }
+button { cursor:pointer; }
+.table { width:100%; border-collapse:collapse; margin-top:15px; }
+.table th, .table td { border:1px solid #ccc; padding:8px; text-align:center; }
+.table th { background:#eee; }
+.action-btn { background:#2c3e50; color:#fff; border:none; }
+.action-btn:hover { background:#34495e; }
+</style>
+</head>
+
+<body>
+
+<h2>🍾 存酒取用</h2>
+
+<label>客戶手機：</label>
+<input id="phone" placeholder="09xxxxxxxx">
+<button onclick="query()">查詢</button>
+
+<table class="table" id="resultTable" style="display:none;">
+<thead>
+<tr>
+<th>客戶</th>
+<th>酒品</th>
+<th>剩餘</th>
+<th>到期日</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody id="resultBody"></tbody>
+</table>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxK9jLWPk22jb-Mv1975LNMCGgyND0ewfk3ta_49YiYFwyYdXlXAIGTAIzcruUuoErOVw/exec";
+
+async function query(){
+  const phone = document.getElementById("phone").value.trim();
+  if(!phone){ alert("請輸入手機"); return; }
+
+  const res = await fetch(`${API_URL}?action=queryStoredWine&phone=${phone}`);
+  const data = await res.json();
+
+  if(data.data.length === 0){
+    alert("查無存酒");
+    return;
+  }
+
+  const body = document.getElementById("resultBody");
+  body.innerHTML = "";
+
+  data.data.forEach(r=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.customerName}</td>
+      <td>${r.productName}</td>
+      <td>${r.remainQty} ${r.unit}</td>
+      <td>${r.expireDate}</td>
+      <td>
+        <button class="action-btn"
+          onclick="take('${r.storedId}',${r.remainQty})">取酒</button>
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+
+  document.getElementById("resultTable").style.display="table";
+}
+
+async function take(storedId, remain){
+  const qty = prompt(`輸入取用量（剩餘 ${remain}）`);
+  if(!qty) return;
+  if(Number(qty) <= 0 || Number(qty) > remain){
+    alert("取用量錯誤");
+    return;
+  }
+
+  const payload = {
+    storedId,
+    takeQty: Number(qty),
+    operator: "櫃檯"
+  };
+
+  const res = await fetch(`${API_URL}?action=takeStoredWine`,{
+    method:"POST",
+    body:JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+  if(data.status==="success"){
+    alert("取酒完成");
+    query();
+  } else {
+    alert("取酒失敗");
+  }
+}
+</script>
+
+</body>
+</html>
