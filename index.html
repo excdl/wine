@@ -4,157 +4,164 @@
 <meta charset="UTF-8">
 <title>取酒查詢</title>
 <style>
-  body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #f0f2f5;
-    padding: 30px;
-    color: #333;
-  }
-  h2 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 18px;
-  }
-  .search-box {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  input#phone {
-    width: 240px;
-    padding: 10px;
-    border: 1px solid #bbb;
-    border-radius: 6px;
-    font-size: 16px;
-  }
-  button.primary {
-    background: #2d7cff;
-    border: none;
-    color: white;
-    padding: 10px 18px;
-    border-radius: 6px;
-    font-size: 16px;
-  }
-  button.primary:hover {
-    background: #236bd3;
-  }
-  button.cancel-btn {
-    background: #e74c3c;
-    border: none;
-    color: white;
-    padding: 10px 18px;
-    border-radius: 6px;
-    font-size: 16px;
-  }
-  button.cancel-btn:hover {
-    background: #c0392b;
-  }
-  table.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-  }
-  .table th, .table td {
-    border: 1px solid #ccc;
-    padding: 12px;
-    text-align: center;
-    font-size: 14px;
-  }
-  .table th {
-    background: #e8e8e8;
-  }
-  button.action-btn {
-    background: #27ae60;
-    border: none;
-    color: white;
-    padding: 8px 14px;
-    border-radius: 5px;
-    font-size: 14px;
-  }
-  button.action-btn:hover {
-    background: #1e874b;
-  }
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f0f2f5;
+  padding: 20px;
+  color: #333;
+}
 
-  /* Modal */
-  .modal-bg {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4);
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  .modal-container {
-    position: relative;
-    background: white;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 380px;
-    padding: 20px 20px 30px 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-  }
-  .modal-header {
-    font-weight: bold;
-    font-size: 18px;
-    text-align: center;
-    margin-bottom: 12px;
-  }
-  .modal-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #ccc;
-    border: none;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    line-height: 28px;
-    text-align: center;
-  }
-  .modal-close:hover {
-    background: #b3b3b3;
-  }
- .modal-body input {
-  width: calc(100% - 20px); /* 卡片內預留左右間距 */
-  max-width: 300px;         /* 最大寬度，不會超出卡片 */
+/* 標題兩行設定 */
+h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 18px;
+}
+h2 .line1 { font-size: 1.4em; font-weight: bold; display: block; }
+h2 .line2 { font-size: 1.2em; font-weight: normal; display: block; }
+
+.search-box {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+input#phone {
+  width: 100%;
+  max-width: 240px;
+  padding: 10px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+button.primary, button.cancel-btn {
+  flex: 1 1 100px;
+  min-width: 100px;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 16px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+button.primary { background: #2d7cff; }
+button.primary:hover { background: #236bd3; }
+button.cancel-btn { background: #e74c3c; }
+button.cancel-btn:hover { background: #c0392b; }
+
+/* 卡片列表 */
+#resultList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.card .row {
+  display: flex;
+  justify-content: space-between;
+}
+.card .row span { font-size: 14px; }
+
+/* 剩餘量進度條 */
+.progress-bar-container {
+  width: 100%;
+  background: #eee;
+  border-radius: 6px;
+  height: 10px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.progress-bar {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s;
+}
+
+/* 取酒按鈕 */
+button.action-btn {
+  background: #27ae60;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  align-self: flex-end;
+}
+button.action-btn:hover { background: #1e874b; }
+
+/* Modal */
+.modal-bg {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.modal-container {
+  position: relative;
+  background: white;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 380px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.modal-header { font-weight: bold; font-size: 18px; text-align: center; margin-bottom: 12px; }
+.modal-close {
+  position: absolute; top: 10px; right: 10px;
+  background: #ccc; border: none; border-radius: 50%;
+  width: 28px; height: 28px; font-size: 16px; font-weight: bold;
+  cursor: pointer; line-height: 28px; text-align: center;
+}
+.modal-close:hover { background: #b3b3b3; }
+.modal-body input {
+  width: 100%;
   padding: 10px;
   border: 1px solid #aaa;
   border-radius: 6px;
   font-size: 16px;
-  margin: 0 auto 14px auto; /* 置中顯示 */
-  display: block;
+  margin-bottom: 14px;
+  box-sizing: border-box;
 }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.modal-btn { padding: 8px 14px; border: none; border-radius: 5px; font-size: 14px; cursor: pointer; }
+.modal-btn.confirm { background: #27ae60; color: white; }
+.modal-btn.confirm:hover { background: #1e874b; }
 
-  .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  .modal-btn {
-    padding: 8px 14px;
-    border: none;
-    border-radius: 5px;
-    font-size: 14px;
-  }
-  .modal-btn.confirm {
-    background: #27ae60;
-    color: white;
-  }
-  .modal-btn.confirm:hover {
-    background: #1e874b;
-  }
+/* 手機響應式 */
+@media (max-width: 480px) {
+  h2 .line1 { font-size: 1.2em; }
+  h2 .line2 { font-size: 1em; }
+  input#phone { max-width: 100%; }
+  button.primary, button.cancel-btn { flex: 1 1 100%; font-size: 15px; padding: 10px; }
+  button.action-btn { font-size: 13px; padding: 5px 8px; }
+}
 </style>
 </head>
-
 <body>
 
-<h2>MeiMeiの店 存酒查詢</h2>
+<h2>
+  <span class="line1">MeiMeiの店</span>
+  <span class="line2">存酒查詢</span>
+</h2>
 
 <div class="search-box">
   <input id="phone" placeholder="請輸入客戶手機 09xxxxxxxx">
@@ -162,18 +169,7 @@
   <button class="cancel-btn" onclick="clearPhone()">取消</button>
 </div>
 
-<table class="table" id="resultTable" style="display:none;">
-  <thead>
-    <tr>
-      <th>客戶</th>
-      <th>酒品</th>
-      <th>剩餘</th>
-      <th>到期日</th>
-      <th>操作</th>
-    </tr>
-  </thead>
-  <tbody id="resultBody"></tbody>
-</table>
+<div id="resultList"></div>
 
 <!-- 取酒 Modal -->
 <div class="modal-bg" id="modalBg">
@@ -199,8 +195,13 @@ let currentProductName = "";
 
 function clearPhone() {
   document.getElementById("phone").value = "";
-  document.getElementById("resultBody").innerHTML = "";
-  document.getElementById("resultTable").style.display = "none";
+  document.getElementById("resultList").innerHTML = "";
+}
+
+function getProgressColor(percent, daysToExpire) {
+  if (daysToExpire <= 3) return "#e74c3c"; // 快到期紅色
+  if (percent < 0.3) return "#f1c40f"; // 剩餘少黃
+  return "#27ae60"; // 正常綠
 }
 
 async function query(){
@@ -210,31 +211,39 @@ async function query(){
   const res = await fetch(`${API_URL}?action=queryStoredWine&phone=${phone}`);
   const data = await res.json();
 
-  const body = document.getElementById("resultBody");
-  body.innerHTML = "";
+  const list = document.getElementById("resultList");
+  list.innerHTML = "";
 
   if(!data.data || data.data.length === 0){
     alert("查無存酒紀錄");
-    document.getElementById("resultTable").style.display="none";
     return;
   }
 
-  data.data.forEach(r => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${r.customerName}</td>
-      <td>${r.productName}</td>
-      <td>${r.remainQty} ${r.unit}</td>
-      <td>${r.expireDate}</td>
-      <td>
-        <button class="action-btn"
-          onclick="openTakeModal('${r.storedId}',${r.remainQty},'${r.productName}')">取酒</button>
-      </td>
-    `;
-    body.appendChild(tr);
-  });
+  const today = new Date();
 
-  document.getElementById("resultTable").style.display="table";
+  data.data.forEach(r => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const expireDate = new Date(r.expireDate);
+    const diffDays = Math.ceil((expireDate - today) / (1000*60*60*24));
+    const remainPercent = r.remainQty / (r.totalQty || r.remainQty); 
+
+    const progressColor = getProgressColor(remainPercent, diffDays);
+    const expireWarning = diffDays <= 3 ? "⚠️ 即將到期" : "";
+
+    card.innerHTML = `
+      <div class="row"><span>客戶：</span><span>${r.customerName}</span></div>
+      <div class="row"><span>酒品：</span><span>${r.productName}</span></div>
+      <div class="row"><span>剩餘：</span><span>${r.remainQty} ${r.unit}</span></div>
+      <div class="row"><span>到期日：</span><span style="color:${diffDays<=3?'#e74c3c':'#333'}">${r.expireDate} ${expireWarning}</span></div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" style="width:${remainPercent*100}%; background:${progressColor}"></div>
+      </div>
+      <button class="action-btn" onclick="openTakeModal('${r.storedId}',${r.remainQty},'${r.productName}')">取酒</button>
+    `;
+    list.appendChild(card);
+  });
 }
 
 function openTakeModal(storedId, remain, productName) {
@@ -274,7 +283,7 @@ async function confirmTake() {
   if(result.status === "success"){
     alert("取酒成功！");
     closeModal();
-    query(); // 重新查詢
+    query(); 
   } else {
     alert("取酒失敗");
   }
@@ -283,5 +292,6 @@ async function confirmTake() {
 
 </body>
 </html>
+
 
 
