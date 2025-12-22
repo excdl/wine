@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>取酒查詢</title>
+
 <style>
+/* ===== 基本設定 ===== */
 body {
   font-family: "Segoe UI", Arial, sans-serif;
   background: #f0f2f5;
@@ -11,151 +13,212 @@ body {
   color: #333;
 }
 
-/* 標題兩行設定 */
+/* ===== 標題（兩行） ===== */
 h2 {
   text-align: center;
   color: #2c3e50;
   margin-bottom: 18px;
 }
-h2 .line1 { font-size: 1.4em; font-weight: bold; display: block; }
-h2 .line2 { font-size: 1.2em; font-weight: normal; display: block; }
+h2 .line1 {
+  font-size: 1.6em;
+  font-weight: bold;
+  display: block;
+}
+h2 .line2 {
+  font-size: 1.3em;
+  display: block;
+}
 
+/* ===== 搜尋區 ===== */
 .search-box {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
   gap: 10px;
+  align-items: center;
   margin-bottom: 20px;
 }
+
 input#phone {
-  width: 100%;
-  max-width: 240px;
-  padding: 10px;
+  flex: 1;
+  padding: 12px;
+  font-size: 18px;
+  border-radius: 8px;
   border: 1px solid #bbb;
-  border-radius: 6px;
-  font-size: 16px;
-  box-sizing: border-box;
 }
-button.primary, button.cancel-btn {
-  flex: 1 1 100px;
-  min-width: 100px;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 16px;
+
+/* 查詢按鈕 */
+button.primary {
+  flex: 0.5;
+  padding: 12px;
+  font-size: 18px;
+  border-radius: 8px;
   border: none;
+  background: #2d7cff;
   color: #fff;
   cursor: pointer;
 }
-button.primary { background: #2d7cff; }
-button.primary:hover { background: #236bd3; }
-button.cancel-btn { background: #e74c3c; }
-button.cancel-btn:hover { background: #c0392b; }
+button.primary:hover {
+  background: #236bd3;
+}
 
-/* 卡片列表 */
+/* ✕ 清除 icon */
+button.clear-icon {
+  flex: 0 0 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #e0e0e0;
+  font-size: 22px;
+  font-weight: bold;
+  color: #555;
+  cursor: pointer;
+}
+button.clear-icon:hover {
+  background: #cfcfcf;
+}
+button.clear-icon:active {
+  transform: scale(0.9);
+}
+
+/* ===== 卡片列表 ===== */
 #resultList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
+
 .card {
-  background: white;
-  border-radius: 10px;
-  padding: 12px 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  position: relative;
-  overflow: hidden;
+  gap: 10px;
 }
+
 .card .row {
   display: flex;
   justify-content: space-between;
 }
-.card .row span { font-size: 14px; }
 
-/* 剩餘量進度條 */
+/* 內容文字加大 */
+.card .row span {
+  font-size: 17px;
+}
+
+/* 標籤淡色、值醒目 */
+.card .row span:first-child {
+  color: #7f8c8d;
+}
+.card .row span:last-child {
+  font-weight: 600;
+}
+
+/* ===== 進度條 ===== */
 .progress-bar-container {
-  width: 100%;
+  height: 12px;
   background: #eee;
   border-radius: 6px;
-  height: 10px;
   overflow: hidden;
-  margin-top: 6px;
 }
 .progress-bar {
   height: 100%;
-  border-radius: 6px;
   transition: width 0.3s;
 }
 
-/* 取酒按鈕 */
+/* ===== 取酒按鈕 ===== */
 button.action-btn {
-  background: #27ae60;
-  border: none;
-  color: white;
-  padding: 6px 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  cursor: pointer;
   align-self: flex-end;
+  padding: 8px 14px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+  background: #27ae60;
+  color: #fff;
+  cursor: pointer;
 }
-button.action-btn:hover { background: #1e874b; }
+button.action-btn:hover {
+  background: #1e874b;
+}
 
-/* Modal */
+/* ===== Modal ===== */
 .modal-bg {
   display: none;
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  inset: 0;
   background: rgba(0,0,0,0.4);
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 10px;
-  box-sizing: border-box;
 }
+
 .modal-container {
-  position: relative;
-  background: white;
-  border-radius: 10px;
+  background: #fff;
+  border-radius: 12px;
   width: 100%;
   max-width: 380px;
   padding: 20px;
-  box-sizing: border-box;
+  position: relative;
 }
-.modal-header { font-weight: bold; font-size: 18px; text-align: center; margin-bottom: 12px; }
+
+.modal-header {
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
 .modal-close {
-  position: absolute; top: 10px; right: 10px;
-  background: #ccc; border: none; border-radius: 50%;
-  width: 28px; height: 28px; font-size: 16px; font-weight: bold;
-  cursor: pointer; line-height: 28px; text-align: center;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #ccc;
+  font-size: 18px;
+  cursor: pointer;
 }
-.modal-close:hover { background: #b3b3b3; }
+
+.modal-body p {
+  font-size: 17px;
+  margin-bottom: 10px;
+}
+
 .modal-body input {
   width: 100%;
+  font-size: 20px;
   padding: 10px;
-  border: 1px solid #aaa;
   border-radius: 6px;
-  font-size: 16px;
-  margin-bottom: 14px;
-  box-sizing: border-box;
+  border: 1px solid #aaa;
 }
-.modal-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
-.modal-btn { padding: 8px 14px; border: none; border-radius: 5px; font-size: 14px; cursor: pointer; }
-.modal-btn.confirm { background: #27ae60; color: white; }
-.modal-btn.confirm:hover { background: #1e874b; }
 
-/* 手機響應式 */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.modal-btn.confirm {
+  font-size: 16px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background: #27ae60;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ===== 手機微調 ===== */
 @media (max-width: 480px) {
-  h2 .line1 { font-size: 1.2em; }
-  h2 .line2 { font-size: 1em; }
-  input#phone { max-width: 100%; }
-  button.primary, button.cancel-btn { flex: 1 1 100%; font-size: 15px; padding: 10px; }
-  button.action-btn { font-size: 13px; padding: 5px 8px; }
+  .card .row span {
+    font-size: 18px;
+  }
 }
 </style>
 </head>
+
 <body>
 
 <h2>
@@ -166,19 +229,19 @@ button.action-btn:hover { background: #1e874b; }
 <div class="search-box">
   <input id="phone" placeholder="請輸入客戶手機 09xxxxxxxx">
   <button class="primary" onclick="query()">查詢</button>
-  <button class="cancel-btn" onclick="clearPhone()">取消</button>
+  <button class="clear-icon" onclick="clearPhone()" title="清除">✕</button>
 </div>
 
 <div id="resultList"></div>
 
-<!-- 取酒 Modal -->
+<!-- Modal -->
 <div class="modal-bg" id="modalBg">
   <div class="modal-container">
     <button class="modal-close" onclick="closeModal()">×</button>
-    <div class="modal-header">🔔 輸入取用數量</div>
+    <div class="modal-header">輸入取用數量</div>
     <div class="modal-body">
       <p id="modalInfo"></p>
-      <input type="number" id="takeQtyInput" min="1" placeholder="請輸入數量">
+      <input type="number" id="takeQtyInput" min="1">
     </div>
     <div class="modal-actions">
       <button class="modal-btn confirm" onclick="confirmTake()">確定</button>
@@ -191,69 +254,63 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxaUbrIQLC9qLCaKfdCxgsP
 
 let currentStoredId = "";
 let currentRemain = 0;
-let currentProductName = "";
 
 function clearPhone() {
   document.getElementById("phone").value = "";
   document.getElementById("resultList").innerHTML = "";
 }
 
-function getProgressColor(percent, daysToExpire) {
-  if (daysToExpire <= 3) return "#e74c3c"; // 快到期紅色
-  if (percent < 0.3) return "#f1c40f"; // 剩餘少黃
-  return "#27ae60"; // 正常綠
+function getColor(percent, days) {
+  if (days <= 3) return "#e74c3c";
+  if (percent < 0.3) return "#f1c40f";
+  return "#27ae60";
 }
 
-async function query(){
+async function query() {
   const phone = document.getElementById("phone").value.trim();
-  if(!phone){ alert("請輸入手機號碼"); return; }
+  if (!phone) return alert("請輸入手機");
 
   const res = await fetch(`${API_URL}?action=queryStoredWine&phone=${phone}`);
   const data = await res.json();
-
   const list = document.getElementById("resultList");
   list.innerHTML = "";
-
-  if(!data.data || data.data.length === 0){
-    alert("查無存酒紀錄");
-    return;
-  }
 
   const today = new Date();
 
   data.data.forEach(r => {
+    const expire = new Date(r.expireDate);
+    const days = Math.ceil((expire - today) / 86400000);
+    const percent = r.remainQty / (r.totalQty || r.remainQty);
+    const color = getColor(percent, days);
+
     const card = document.createElement("div");
     card.className = "card";
-
-    const expireDate = new Date(r.expireDate);
-    const diffDays = Math.ceil((expireDate - today) / (1000*60*60*24));
-    const remainPercent = r.remainQty / (r.totalQty || r.remainQty); 
-
-    const progressColor = getProgressColor(remainPercent, diffDays);
-    const expireWarning = diffDays <= 3 ? "⚠️ 即將到期" : "";
-
     card.innerHTML = `
-      <div class="row"><span>客戶：</span><span>${r.customerName}</span></div>
-      <div class="row"><span>酒品：</span><span>${r.productName}</span></div>
-      <div class="row"><span>剩餘：</span><span>${r.remainQty} ${r.unit}</span></div>
-      <div class="row"><span>到期日：</span><span style="color:${diffDays<=3?'#e74c3c':'#333'}">${r.expireDate} ${expireWarning}</span></div>
-      <div class="progress-bar-container">
-        <div class="progress-bar" style="width:${remainPercent*100}%; background:${progressColor}"></div>
+      <div class="row"><span>客戶</span><span>${r.customerName}</span></div>
+      <div class="row"><span>酒品</span><span>${r.productName}</span></div>
+      <div class="row"><span>剩餘</span><span>${r.remainQty} ${r.unit}</span></div>
+      <div class="row">
+        <span>到期</span>
+        <span style="color:${days<=3?'#e74c3c':'#333'}">
+          ${r.expireDate} ${days<=3?'⚠️ 即將到期':''}
+        </span>
       </div>
-      <button class="action-btn" onclick="openTakeModal('${r.storedId}',${r.remainQty},'${r.productName}')">取酒</button>
+      <div class="progress-bar-container">
+        <div class="progress-bar" style="width:${percent*100}%;background:${color}"></div>
+      </div>
+      <button class="action-btn"
+        onclick="openTakeModal('${r.storedId}',${r.remainQty},'${r.productName}')">
+        取酒
+      </button>
     `;
     list.appendChild(card);
   });
 }
 
-function openTakeModal(storedId, remain, productName) {
-  currentStoredId = storedId;
+function openTakeModal(id, remain, name) {
+  currentStoredId = id;
   currentRemain = remain;
-  currentProductName = productName;
-
-  document.getElementById("modalInfo").innerText =
-    `【${productName}】剩餘：${remain}`;
-  document.getElementById("takeQtyInput").value = "";
+  document.getElementById("modalInfo").innerText = `【${name}】剩餘：${remain}`;
   document.getElementById("modalBg").style.display = "flex";
 }
 
@@ -263,30 +320,15 @@ function closeModal() {
 
 async function confirmTake() {
   const qty = Number(document.getElementById("takeQtyInput").value);
-  if(!qty || qty <= 0 || qty > currentRemain){
-    alert("請輸入有效數量");
-    return;
-  }
+  if (!qty || qty <= 0 || qty > currentRemain) return alert("數量錯誤");
 
-  const payload = {
-    storedId: currentStoredId,
-    takeQty: qty,
-    operator: "櫃檯"
-  };
-
-  const res = await fetch(`${API_URL}?action=takeStoredWine`, {
+  await fetch(`${API_URL}?action=takeStoredWine`, {
     method: "POST",
-    body: JSON.stringify(payload)
+    body: JSON.stringify({ storedId: currentStoredId, takeQty: qty })
   });
-  const result = await res.json();
 
-  if(result.status === "success"){
-    alert("取酒成功！");
-    closeModal();
-    query(); 
-  } else {
-    alert("取酒失敗");
-  }
+  closeModal();
+  query();
 }
 </script>
 
