@@ -11,6 +11,7 @@ body {
   background: #f0f2f5;
   padding: 20px;
   color: #222;
+  font-size: 18px;
 }
 
 /* ===== 標題（兩行） ===== */
@@ -74,7 +75,7 @@ button.clear-btn {
 .table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 680px;   /* 讓手機滑動而不是擠字 */
+  min-width: 680px;   /* 讓手機橫滑而不擠字 */
 }
 
 .table th {
@@ -87,7 +88,7 @@ button.clear-btn {
 .table td {
   border: 1px solid #ccc;
   padding: 16px 10px;   /* 列高 */
-  font-size: 22px;     /* 內容字超大 */
+  font-size: 22px;      /* 內容字超大 */
   font-weight: 600;
   text-align: center;
   vertical-align: middle;
@@ -99,7 +100,7 @@ button.clear-btn {
   font-weight: bold;
 }
 
-/* ===== 取酒按鈕 ===== */
+/* 取酒按鈕 */
 button.action-btn {
   font-size: 18px;
   padding: 8px 14px;
@@ -118,6 +119,7 @@ button.action-btn {
   background: rgba(0,0,0,0.45);
   align-items: center;
   justify-content: center;
+  z-index: 1000;
 }
 
 .modal-container {
@@ -126,6 +128,26 @@ button.action-btn {
   width: 90%;
   max-width: 360px;
   padding: 20px;
+  position: relative;
+}
+
+/* 右上角 X */
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #ddd;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 34px;
+}
+.modal-close:hover {
+  background: #cfcfcf;
 }
 
 .modal-header {
@@ -138,10 +160,15 @@ button.action-btn {
 .modal-body p {
   font-size: 18px;
   margin-bottom: 10px;
+  text-align: center;
 }
 
+/* 輸入框置中且不超出卡片 */
 .modal-body input {
   width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
+  display: block;
   font-size: 22px;
   padding: 10px;
   border-radius: 6px;
@@ -160,6 +187,7 @@ button.action-btn {
   border: none;
   background: #27ae60;
   color: #fff;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -178,23 +206,24 @@ button.action-btn {
 </div>
 
 <div class="table-wrapper">
-<table class="table" id="resultTable" style="display:none;">
-  <thead>
-    <tr>
-      <th>客戶</th>
-      <th>酒品</th>
-      <th>剩餘</th>
-      <th>到期日</th>
-      <th>操作</th>
-    </tr>
-  </thead>
-  <tbody id="resultBody"></tbody>
-</table>
+  <table class="table" id="resultTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>客戶</th>
+        <th>酒品</th>
+        <th>剩餘</th>
+        <th>到期日</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody id="resultBody"></tbody>
+  </table>
 </div>
 
 <!-- Modal -->
 <div class="modal-bg" id="modalBg">
   <div class="modal-container">
+    <button class="modal-close" onclick="closeModal()">×</button>
     <div class="modal-header">輸入取酒數量</div>
     <div class="modal-body">
       <p id="modalInfo"></p>
@@ -212,6 +241,14 @@ const API_URL =
 
 let currentStoredId = "";
 let currentRemain = 0;
+
+// DOM shortcuts
+const phone = document.getElementById("phone");
+const resultTable = document.getElementById("resultTable");
+const resultBody = document.getElementById("resultBody");
+const modalBg = document.getElementById("modalBg");
+const modalInfo = document.getElementById("modalInfo");
+const takeQtyInput = document.getElementById("takeQtyInput");
 
 function clearPhone() {
   phone.value = "";
@@ -267,7 +304,12 @@ function openTakeModal(id, remain, name) {
   currentStoredId = id;
   currentRemain = remain;
   modalInfo.innerText = `【${name}】剩餘：${remain}`;
+  takeQtyInput.value = "";
   modalBg.style.display = "flex";
+}
+
+function closeModal() {
+  modalBg.style.display = "none";
 }
 
 function confirmTake() {
@@ -289,6 +331,7 @@ function confirmTake() {
 
 </body>
 </html>
+
 
 
 
