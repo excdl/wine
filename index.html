@@ -39,6 +39,17 @@
   button.primary:hover {
     background: #236bd3;
   }
+  button.cancel-btn {
+    background: #e74c3c;
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 16px;
+  }
+  button.cancel-btn:hover {
+    background: #c0392b;
+  }
   table.table {
     width: 100%;
     border-collapse: collapse;
@@ -77,18 +88,37 @@
     z-index: 1000;
   }
   .modal-container {
+    position: relative;
     background: white;
     border-radius: 10px;
     width: 90%;
     max-width: 380px;
-    padding: 20px;
+    padding: 20px 20px 30px 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.12);
   }
   .modal-header {
     font-weight: bold;
     font-size: 18px;
-    margin-bottom: 10px;
     text-align: center;
+    margin-bottom: 12px;
+  }
+  .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ccc;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 28px;
+    text-align: center;
+  }
+  .modal-close:hover {
+    background: #b3b3b3;
   }
   .modal-body input {
     width: 100%;
@@ -109,26 +139,24 @@
     border-radius: 5px;
     font-size: 14px;
   }
-  .modal-btn.cancel {
-    background: #aaa;
-    color: white;
-  }
   .modal-btn.confirm {
     background: #27ae60;
     color: white;
   }
-  .modal-btn.cancel:hover { background: #888; }
-  .modal-btn.confirm:hover { background: #1e874b; }
+  .modal-btn.confirm:hover {
+    background: #1e874b;
+  }
 </style>
 </head>
 
 <body>
 
-<h2>🍷 存酒查詢</h2>
+<h2>MeiMeiの店 存酒查詢</h2>
 
 <div class="search-box">
   <input id="phone" placeholder="請輸入客戶手機 09xxxxxxxx">
   <button class="primary" onclick="query()">查詢</button>
+  <button class="cancel-btn" onclick="clearPhone()">取消</button>
 </div>
 
 <table class="table" id="resultTable" style="display:none;">
@@ -147,13 +175,13 @@
 <!-- 取酒 Modal -->
 <div class="modal-bg" id="modalBg">
   <div class="modal-container">
+    <button class="modal-close" onclick="closeModal()">×</button>
     <div class="modal-header">🔔 輸入取用數量</div>
     <div class="modal-body">
       <p id="modalInfo"></p>
-      <input type="number" id="takeQtyInput" min="1" placeholder="請輸入取用數量">
+      <input type="number" id="takeQtyInput" min="1" placeholder="請輸入數量">
     </div>
     <div class="modal-actions">
-      <button class="modal-btn cancel" onclick="closeModal()">取消</button>
       <button class="modal-btn confirm" onclick="confirmTake()">確定</button>
     </div>
   </div>
@@ -165,6 +193,12 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxaUbrIQLC9qLCaKfdCxgsP
 let currentStoredId = "";
 let currentRemain = 0;
 let currentProductName = "";
+
+function clearPhone() {
+  document.getElementById("phone").value = "";
+  document.getElementById("resultBody").innerHTML = "";
+  document.getElementById("resultTable").style.display = "none";
+}
 
 async function query(){
   const phone = document.getElementById("phone").value.trim();
@@ -206,7 +240,7 @@ function openTakeModal(storedId, remain, productName) {
   currentProductName = productName;
 
   document.getElementById("modalInfo").innerText =
-    `【${productName}】 剩餘：${remain}`;
+    `【${productName}】剩餘：${remain}`;
   document.getElementById("takeQtyInput").value = "";
   document.getElementById("modalBg").style.display = "flex";
 }
@@ -246,4 +280,5 @@ async function confirmTake() {
 
 </body>
 </html>
+
 
