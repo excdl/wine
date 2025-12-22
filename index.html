@@ -2,60 +2,195 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>取酒系統</title>
+<title>🍾 存酒取用系統</title>
 <style>
-body { font-family: Arial; background:#f5f6fa; padding:20px; }
-h2 { margin-bottom:10px; }
-input, button { font-size:16px; padding:8px; }
-button { cursor:pointer; }
-.table { width:100%; border-collapse:collapse; margin-top:15px; }
-.table th, .table td { border:1px solid #ccc; padding:8px; text-align:center; }
-.table th { background:#eee; }
-.action-btn { background:#2c3e50; color:#fff; border:none; }
-.action-btn:hover { background:#34495e; }
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f2f5;
+    padding: 30px;
+    color: #333;
+  }
+
+  h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+
+  .search-box {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  input#phone {
+    width: 240px;
+    padding: 10px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    font-size: 1em;
+  }
+
+  button.primary {
+    background: #2d7cff;
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 1em;
+  }
+  button.primary:hover {
+    background: #236bd3;
+  }
+
+  table.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+  .table th, .table td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: center;
+    font-size: 0.95em;
+  }
+  .table th {
+    background: #e8e8e8;
+  }
+
+  button.action-btn {
+    background: #27ae60;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 0.9em;
+  }
+  button.action-btn:hover {
+    background: #1e874b;
+  }
+
+  /* ===== Modal ===== */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modal-container {
+    background: white;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .modal-header {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 12px;
+    color: #2c3e50;
+  }
+  .modal-body input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    font-size: 1em;
+    margin-bottom: 12px;
+  }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .modal-btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.95em;
+  }
+  .modal-btn.cancel {
+    background: #aaa;
+    color: white;
+  }
+  .modal-btn.confirm {
+    background: #27ae60;
+    color: white;
+  }
+  .modal-btn.cancel:hover { background: #888; }
+  .modal-btn.confirm:hover { background: #1e874b; }
 </style>
 </head>
 
 <body>
 
-<h2>🍾 存酒取用</h2>
+<h2>🍷 存酒 & 取酒查詢系統</h2>
 
-<label>客戶手機：</label>
-<input id="phone" placeholder="09xxxxxxxx">
-<button onclick="query()">查詢</button>
+<div class="search-box">
+  <input id="phone" placeholder="請輸入客戶手機 09xxxxxxxx">
+  <button class="primary" onclick="query()">查詢存酒</button>
+</div>
 
 <table class="table" id="resultTable" style="display:none;">
-<thead>
-<tr>
-<th>客戶</th>
-<th>酒品</th>
-<th>剩餘</th>
-<th>到期日</th>
-<th>操作</th>
-</tr>
-</thead>
-<tbody id="resultBody"></tbody>
+  <thead>
+    <tr>
+      <th>客戶</th>
+      <th>酒品</th>
+      <th>剩餘</th>
+      <th>到期日</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody id="resultBody"></tbody>
 </table>
+
+<!-- 取酒 Modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal-container">
+    <div class="modal-header">取酒確認</div>
+    <div class="modal-body">
+      <p id="modalInfo"></p>
+      <input type="number" id="takeQtyInput" min="1" placeholder="輸入取用量">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+      <button class="modal-btn confirm" onclick="confirmTake()">確定取酒</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbxaUbrIQLC9qLCaKfdCxgsPgYeUTjoeywCN2SHResxav42QfAD_o3TiJBU8MHrK3ifoeQ/exec";
 
+let currentStoredId = "";
+let currentRemain = 0;
+let currentProductName = "";
+
 async function query(){
   const phone = document.getElementById("phone").value.trim();
-  if(!phone){ alert("請輸入手機"); return; }
+  if(!phone){ alert("請輸入手機號碼"); return; }
 
   const res = await fetch(`${API_URL}?action=queryStoredWine&phone=${phone}`);
   const data = await res.json();
 
-  if(data.data.length === 0){
-    alert("查無存酒");
-    return;
-  }
-
   const body = document.getElementById("resultBody");
   body.innerHTML = "";
 
-  data.data.forEach(r=>{
+  if(!data.data || data.data.length === 0){
+    alert("查無存酒紀錄");
+    document.getElementById("resultTable").style.display="none";
+    return;
+  }
+
+  data.data.forEach(r => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r.customerName}</td>
@@ -64,7 +199,7 @@ async function query(){
       <td>${r.expireDate}</td>
       <td>
         <button class="action-btn"
-          onclick="take('${r.storedId}',${r.remainQty})">取酒</button>
+          onclick="openTakeModal('${r.storedId}',${r.remainQty},'${r.productName}')">取酒</button>
       </td>
     `;
     body.appendChild(tr);
@@ -73,31 +208,49 @@ async function query(){
   document.getElementById("resultTable").style.display="table";
 }
 
-async function take(storedId, remain){
-  const qty = prompt(`輸入取用量（剩餘 ${remain}）`);
-  if(!qty) return;
-  if(Number(qty) <= 0 || Number(qty) > remain){
-    alert("取用量錯誤");
+// 開啟 Modal
+function openTakeModal(storedId, remain, productName) {
+  currentStoredId = storedId;
+  currentRemain = remain;
+  currentProductName = productName;
+
+  document.getElementById("modalInfo").innerText =
+    `【${productName}】可取用剩餘 ${remain} 單位`;
+  document.getElementById("takeQtyInput").value = "";
+  document.getElementById("modalBg").style.display = "flex";
+}
+
+// 關閉 Modal
+function closeModal() {
+  document.getElementById("modalBg").style.display = "none";
+}
+
+// 確認取酒
+async function confirmTake() {
+  const qty = Number(document.getElementById("takeQtyInput").value);
+  if(!qty || qty <= 0 || qty > currentRemain){
+    alert("請輸入有效取用數量");
     return;
   }
 
   const payload = {
-    storedId,
-    takeQty: Number(qty),
+    storedId: currentStoredId,
+    takeQty: qty,
     operator: "櫃檯"
   };
 
-  const res = await fetch(`${API_URL}?action=takeStoredWine`,{
-    method:"POST",
-    body:JSON.stringify(payload)
+  const res = await fetch(`${API_URL}?action=takeStoredWine`, {
+    method: "POST",
+    body: JSON.stringify(payload)
   });
+  const result = await res.json();
 
-  const data = await res.json();
-  if(data.status==="success"){
-    alert("取酒完成");
-    query();
+  if(result.status === "success"){
+    alert("取酒成功！");
+    closeModal();
+    query(); // 重新整理
   } else {
-    alert("取酒失敗");
+    alert("取酒失敗，請稍後再試");
   }
 }
 </script>
