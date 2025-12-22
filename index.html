@@ -120,14 +120,17 @@
   .modal-close:hover {
     background: #b3b3b3;
   }
-  .modal-body input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #aaa;
-    border-radius: 6px;
-    font-size: 16px;
-    margin-bottom: 14px;
-  }
+ .modal-body input {
+  width: calc(100% - 20px); /* 卡片內預留左右間距 */
+  max-width: 300px;         /* 最大寬度，不會超出卡片 */
+  padding: 10px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  font-size: 16px;
+  margin: 0 auto 14px auto; /* 置中顯示 */
+  display: block;
+}
+
   .modal-actions {
     display: flex;
     justify-content: flex-end;
