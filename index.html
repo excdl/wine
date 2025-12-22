@@ -167,7 +167,7 @@ button.action-btn {
 .modal-body input {
   width: 100%;
   max-width: 260px;
-  margin: 0 auto;
+  margin: 0 auto 12px auto;
   display: block;
   font-size: 22px;
   padding: 10px;
@@ -227,7 +227,8 @@ button.action-btn {
     <div class="modal-header">輸入取酒數量</div>
     <div class="modal-body">
       <p id="modalInfo"></p>
-      <input type="number" id="takeQtyInput" min="1">
+      <input type="number" id="takeQtyInput" min="1" placeholder="取酒數量">
+      <input type="text" id="operatorInput" placeholder="經手人姓名">
     </div>
     <div class="modal-actions">
       <button class="modal-btn confirm" onclick="confirmTake()">確定</button>
@@ -239,7 +240,7 @@ button.action-btn {
 const API_URL =
 "https://script.google.com/macros/s/AKfycbxaUbrIQLC9qLCaKfdCxgsPgYeUTjoeywCN2SHResxav42QfAD_o3TiJBU8MHrK3ifoeQ/exec";
 
-let currentStoredId = "";
+let currentStoredId = 0;
 let currentRemain = 0;
 
 // DOM shortcuts
@@ -249,6 +250,7 @@ const resultBody = document.getElementById("resultBody");
 const modalBg = document.getElementById("modalBg");
 const modalInfo = document.getElementById("modalInfo");
 const takeQtyInput = document.getElementById("takeQtyInput");
+const operatorInput = document.getElementById("operatorInput");
 
 function clearPhone() {
   phone.value = "";
@@ -305,6 +307,7 @@ function openTakeModal(id, remain, name) {
   currentRemain = remain;
   modalInfo.innerText = `【${name}】剩餘：${remain}`;
   takeQtyInput.value = "";
+  operatorInput.value = "櫃檯"; // 預設經手人
   modalBg.style.display = "flex";
 }
 
@@ -314,14 +317,26 @@ function closeModal() {
 
 function confirmTake() {
   const qty = Number(takeQtyInput.value);
+  const operator = operatorInput.value.trim();
+
   if (!qty || qty <= 0 || qty > currentRemain) {
     alert("數量錯誤");
     return;
   }
+  if (!operator) {
+    alert("請輸入經手人姓名");
+    return;
+  }
+
+  const payload = {
+    storedId: currentStoredId,
+    takeQty: qty,
+    operator: operator
+  };
 
   fetch(`${API_URL}?action=takeStoredWine`, {
     method: "POST",
-    body: JSON.stringify({ storedId: currentStoredId, takeQty: qty })
+    body: JSON.stringify(payload)
   });
 
   modalBg.style.display = "none";
@@ -331,7 +346,6 @@ function confirmTake() {
 
 </body>
 </html>
-
 
 
 
